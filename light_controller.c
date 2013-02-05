@@ -5,6 +5,8 @@
 #include <util/delay.h>
 
 #include "types.h"
+#include "memory.c"
+
 int main() {
   
   DDRA = _BV(PA1);
