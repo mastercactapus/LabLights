@@ -4,6 +4,7 @@
 #define F_CPU 1000000UL
 #include <util/delay.h>
 
+#include "types.h"
 int main() {
   
   DDRA = _BV(PA1);
