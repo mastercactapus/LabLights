@@ -8,12 +8,6 @@ void setup_pwmAB(void) {
 	DDRB |= _BV(PB2);
 	DDRA |= _BV(PA7);
 }
-void set_pwm_a(uint8_t *pwm) {
-	OCR0A = *pwm;
-}
-void set_pwm_b(uint8_t *pwm) {
-	OCR0B = *pwm;
-}
 
 void start_pwmAB(void) {
 	stop_pwmAB();
