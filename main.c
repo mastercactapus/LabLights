@@ -25,11 +25,21 @@ int main(void) {
   
   setup_pwmAB();
   
+  //set_pwm_a((uint8_t *)0x00);
+  
   start_pwmAB();
   
+  i = 0;
+  uint8_t dir=1;
   while(1) {
-    PORTA ^= _BV(PA1);
-    _delay_ms(1000);
+    if (i == 0xff) {
+		dir=0;
+	} else if (i == 0x01) {
+		dir=1;
+	}
+	dir == 1 ? i++ : i--;
+	set_pwm_a(&i);
+	_delay_ms(2);
   }
 
 }
