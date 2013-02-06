@@ -2,13 +2,12 @@
 #include "cpu.h"
 
 #include <avr/io.h>
-#include <avr/interrupt.h>
 #include <util/delay.h>
-#include <stdio.h>
 
 #include "types.h"
 #include "eeprom.h"
 #include "config_hardware.h"
+#include "control.h"
 
 
 SETTINGS *lights[LIGHTS];
@@ -19,14 +18,11 @@ int main(void) {
   lights[0] = read_settings((uint8_t *)0);
   lights[1] = read_settings((uint8_t *)1);
   
-  
+  setup_pwmAB();
+
   set_pwm_a(&lights[0]->current_level);
   set_pwm_b(&lights[1]->current_level);
-  
-  setup_pwmAB();
-  
-  //set_pwm_a((uint8_t *)0x00);
-  
+
   start_pwmAB();
   
   i = 0;
