@@ -13,7 +13,6 @@
 SETTINGS *lights[LIGHTS];
 
 int main(void) {
-  uint8_t i=0;
 
   lights[0] = read_settings((uint8_t *)0);
   lights[1] = read_settings((uint8_t *)1);
@@ -25,18 +24,11 @@ int main(void) {
 
   start_pwmAB();
   
-  i = 0;
-  uint8_t dir=1;
-  while(1) {
-    if (i == 0xff) {
-		dir=0;
-	} else if (i == 0x01) {
-		dir=1;
-	}
-	dir == 1 ? i++ : i--;
-	set_pwm_a(&i);
-	_delay_ms(2);
-  }
+  fade_pwm_a((uint8_t *) 1000,(uint8_t *)  0xff);
+  fade_pwm_a((uint8_t *) 500,(uint8_t *)  0x4f);
+  fade_pwm_a((uint8_t *) 500,(uint8_t *)  0xcf);
+  fade_pwm_a((uint8_t *) 1000,(uint8_t *)  0x00);
+  fade_pwm_a((uint8_t *) 8000,(uint8_t *)  0xff);
 
 }
 
