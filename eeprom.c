@@ -1,5 +1,5 @@
 #include <avr/eeprom.h>
-#include "memory.h"
+#include "types.h"
 
 SETTINGS* read_settings(uint8_t *light_index) {
 	eeprom_busy_wait();

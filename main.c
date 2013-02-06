@@ -1,11 +1,14 @@
+#define F_CPU 1000000UL
+
 #include <avr/io.h>
 #include <avr/interrupt.h>
-
-#define F_CPU 1000000UL
 #include <util/delay.h>
 
 #include "types.h"
-#include "memory.c"
+#include "eeprom.h"
+
+SETTINGS *lightA;
+SETTINGS *lightB;
 
 int main() {
   
@@ -13,7 +16,7 @@ int main() {
 
   while(1) {
     PORTA ^= _BV(PA1);
-    _delay_ms(5);
+    _delay_ms(1000);
   }
 
 }
