@@ -1,5 +1,5 @@
-#define F_CPU 1000000UL
 #define LIGHTS 2
+#include "cpu.h"
 
 #include <avr/io.h>
 #include <avr/interrupt.h>
