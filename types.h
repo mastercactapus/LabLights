@@ -1,5 +1,8 @@
 #define _HEADER   0b101
 #define _REVISION 11
+
+#define _DEFAULT_SETTINGS {_HEADER,_REVISION,0,0,0,0,0,0,0}
+
 typedef enum //1 bit
 {
 	set,
@@ -46,4 +49,5 @@ typedef struct
 	uint8_t  resume_enable    ; //resume level on power-on
 } SETTINGS;
 
-const SETTINGS default_settings = {_HEADER,_REVISION,0,0,0,0,0,0,0};
+
+
