@@ -5,23 +5,27 @@
 #include <stdlib.h>
 #include <avr/interrupt.h>
 #include "serial.h"
+#include "types.h"
 
 #define TX_DELAY 94 //tuned for 9600bps
 #define TX_PORT PORTB
 #define TX_PIN  PB0
 
-#define RX_DELAY 94 //tuned for 9600bps
+#define RX_DELAY 110 //tuned for 9600bps
 #define RX_PORT PORTB
 #define RX_PIN  PB1
 
-uint8_t data_flag = 0;
-uint8_t data_byte = 0;
+SBUF *s_buffer;
 
 void setup_serial(void) {
   TX_PORT |= _BV(TX_PIN);
   DDRB |= _BV(TX_PIN);
   PCMSK1 |= _BV(PCINT9);
   GIMSK |= _BV(PCIE1);
+  s_buffer = malloc(sizeof(SBUF));
+  s_buffer->flag = 0;
+  s_buffer->byte = 0;
+
 }
 
 void send_byte(uint8_t b)
@@ -46,27 +50,25 @@ void send_bytes(uint8_t *buf, uint8_t len) {
   }
 }
 
-ISR (PCINT0_vect) {
-	cli();
+ISR (PCINT1_vect) {
+	// lightA->status = ON;
 
-	_read_byte();
+	_delay_us(RX_DELAY);
+	uint8_t read = 0;
+	for (uint8_t i=0; i<8; i++){
+		_delay_us(RX_DELAY);
+		if (RX_PORT & _BV(i)) read |= (1 << i);
+	}
+	s_buffer->byte = read;
+	s_buffer->flag = 1;
+	_delay_us(RX_DELAY*2);
 
-	sei();
+	send_byte(s_buffer->byte);
 }
 
 uint8_t read_byte(void) {
-	while(!data_flag);
-	data_flag=0;
-	return data_byte;
+	while(!s_buffer->flag);
+	s_buffer->flag=0;
+	return s_buffer->byte;
 }
 
-void _read_byte(void)
-{
-	data_byte=0;
-	for (uint8_t i=10; i; i--){
-		_delay_us(RX_DELAY);
-		if (RX_PORT & _BV(i)) data_byte |= (1 << i);
-	}
-	data_byte = ~data_byte;
-	data_flag = 1;
-}
