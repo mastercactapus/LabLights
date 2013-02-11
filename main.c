@@ -43,11 +43,11 @@ int main(void) {
   _delay_ms(1000);
   lightA->status = OFF;
 
+  read_byte();
+  lightA->status = ON;
 
-  while (1) {
-    uint8_t t = read_byte();
-    send_byte(t);
-  };
+
+  while(1);
   return 0;
 }
 
