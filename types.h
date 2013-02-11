@@ -1,53 +1,45 @@
-#define _HEADER   0b101
-#define _REVISION 11
+#define _DEFAULT_SETTINGS {0,0,0,0,0xffff}
 
-#define _DEFAULT_SETTINGS {_HEADER,_REVISION,0,0,0,0,0,0,0}
+typedef enum {
+	NOP,
+	DIM_LEVEL,
+	POWER_LEVEL,
+	STATUS,
+	DIM_DELAY,
+	OFF_DELAY
+}COMMAND;
 
-typedef enum //1 bit
+typedef enum {
+	OFF,
+	ON ,
+	DIM 
+}POWER_STATUS;
+
+typedef struct 
 {
-	set,
-	get
-} CMD;
+	uint8_t read_write :1;
+	uint8_t light_AB   :1;
+	COMMAND command    :6;
+	uint16_t value;
+	uint8_t chk; //sum of all + 43
+}REQUEST;
 
-typedef enum //1 bit
+typedef struct 
 {
-	Front,
-	Right
-} LIGHT;
+	uint8_t  auto_off_delay; //minutes 0 = disabled
+	uint8_t  auto_dim_delay; //minutes 0 = disabled
+	uint8_t  power_level   ; //power level when on
+	uint8_t  dim_level     ; //power level to dim (down) to
+	uint16_t checksum      ;
+}LIGHT_SETTINGS;
 
-typedef enum // 3 bits
+
+typedef struct 
 {
-	auto_off,
-	auto_dim,
-	fade_set,
-	fade_off,
-	dim_level,
-	current_level,
-	resume
-} SETGET;
+	LIGHT_SETTINGS *settings;
+	POWER_STATUS    status;
+  uint8_t         minutes ;
+}LIGHT;
 
-typedef struct
-{
-	unsigned char header   : 3;
-	CMD           command  : 1;
-	SETGET        option   : 3;
-	LIGHT         light    : 1;
-	unsigned short PARAM   :16;
-	unsigned char checksum : 8;
-} MESSAGE;
-
-typedef struct
-{
-	uint8_t  header           ;
-	uint8_t  revision         ;
-	uint16_t auto_off_delay   ; //seconds 0 = disabled
-	uint16_t auto_dim_delay   ; //seconds 0 = disabled
-	uint16_t fade_set_duration; //msec    0 = disabled
-	uint16_t fade_off_duration; //msec    0 = disabled
-	uint8_t  dim_level        ;
-	uint8_t  current_level    ;
-	uint8_t  resume_enable    ; //resume level on power-on
-} SETTINGS;
-
-
-
+extern LIGHT *lightA;
+extern LIGHT *lightB;

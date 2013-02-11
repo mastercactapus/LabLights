@@ -1,34 +1,53 @@
-#define LIGHTS 2
 #include "cpu.h"
 
 #include <avr/io.h>
 #include <util/delay.h>
+#include <stdlib.h>
+#include <avr/interrupt.h>
 
 #include "types.h"
 #include "eeprom.h"
 #include "config_hardware.h"
 #include "control.h"
+#include "serial.h"
 
-
-SETTINGS *lights[LIGHTS];
+LIGHT *lightA;
+LIGHT *lightB;
 
 int main(void) {
 
-  lights[0] = read_settings((uint8_t *)0);
-  lights[1] = read_settings((uint8_t *)1);
-  
-  setup_pwmAB();
 
-  set_pwm_a(&lights[0]->current_level);
-  set_pwm_b(&lights[1]->current_level);
+  lightA = malloc(sizeof(LIGHT));
+  lightB = malloc(sizeof(LIGHT));
+  DDRA |= _BV(PA1);
+  setup_serial();
+  read_settings();
+
+  setup_pwmAB();
+  setup_sliderAB();
 
   start_pwmAB();
-  
-  fade_pwm_a((uint8_t *) 1000,(uint8_t *)  0xff);
-  fade_pwm_a((uint8_t *) 500,(uint8_t *)  0x4f);
-  fade_pwm_a((uint8_t *) 500,(uint8_t *)  0xcf);
-  fade_pwm_a((uint8_t *) 1000,(uint8_t *)  0x00);
-  fade_pwm_a((uint8_t *) 8000,(uint8_t *)  0xff);
+  start_sliderAB();
 
+  lightA->settings->power_level = 0xff;
+  lightA->settings->dim_level = 0x10;
+  lightA->status = ON;
+
+  sei();
+  
+
+  _delay_ms(1000);
+  lightA->status = DIM;
+
+
+  _delay_ms(1000);
+  lightA->status = OFF;
+
+
+  while (1) {
+    uint8_t t = read_byte();
+    send_byte(t);
+  };
+  return 0;
 }
 
