@@ -14,9 +14,15 @@
 
 #define _STEPS_PER_SECOND 1000
 #define _SECONDS_PER_MIN 60
-
-
 #define _COUNT (F_CPU/64)/5
+
+
+#define lightB_on DDRA |= _BV(PA7)
+#define lightA_on DDRB |= _BV(PB2)
+#define lightB_off DDRA &= ~(_BV(PA7))
+#define lightA_off DDRB &= ~(_BV(PB2))
+
+
 
 
 //called when timer1 is up
@@ -40,7 +46,7 @@ ISR (TIM1_COMPA_vect) {
 	// }
 
 	
-	if (OCR0A == 1) lightA_on();
+	if (OCR0A == 1) lightA_on;
 	switch(lightA->status) {
 		case ON:
 			if (OCR0A > lightA->settings->power_level) OCR0A--;
@@ -52,11 +58,11 @@ ISR (TIM1_COMPA_vect) {
 			break;
 		case OFF:
 			if (OCR0A > 0) OCR0A--;
-			else lightA_off();
+			else lightA_off;
 			break;
 	}
 
-	if (OCR0B == 1) lightB_on();
+	if (OCR0B == 1) lightB_on;
 	switch(lightB->status) {
 		case ON:
 			if (OCR0B > lightB->settings->power_level) OCR0B--;
@@ -68,53 +74,9 @@ ISR (TIM1_COMPA_vect) {
 			break;
 		case OFF:
 			if (OCR0B > 0) OCR0B--;
-			else lightB_off();
+			else lightB_off;
 			break;
 	}
 
-
-
-	// if ((OCR0A == 0) && (lightA->status == OFF)) lightA_off();
-	// if ((OCR0A == 0) && (lightA->status != OFF)) lightA_on();
-	// if ((OCR0A > 0) && (lightA->status == OFF)) OCR0A--;
-
-	// if (lightA->status == ON) {
-	// 	if (OCR0A > lightA->settings->power_level) OCR0A--;
-	// 	else if (OCR0A < lightA->settings->power_level) OCR0A++;
-	// }
-	// else if (lightA->status == DIM) {
-	// 	if (OCR0A > lightA->settings->dim_level) OCR0A--;
-	// 	else if (OCR0A < lightA->settings->dim_level) OCR0A++;
-	// }
-	// else if (OCR0A > 0) {
-
-	// }
-
-
-	// if ((OCR0B == 0) && (lightB.status == OFF)) lightB_off();
-	// else if ((OCR0B == 0) && (lightB.status != OFF)) lightB_on();
-	// else if ((OCR0B > 0) && (lightB.status == OFF)) OCR0B--;
-
-	// if (lightB.status == ON) {
-	// 	if (OCR0B > lightB.settings->power_level) OCR0B--;
-	// 	else if (OCR0B < lightB.settings->power_level) OCR0B++;
-	// } else if (lightB.status == DIM) {
-	// 	if (OCR0B > lightB.settings->dim_level) OCR0B--;
-	// 	else if (OCR0B < lightB.settings->dim_level) OCR0B++;
-	// }
-
-	PORTA ^= _BV(PA1);
 }
 
-void lightB_on(void) {
-	DDRA |= _BV(PA7);
-}
-void lightA_on(void) {
-	DDRB |= _BV(PB2);
-}
-void lightB_off(void) {
-	DDRA &= ~(_BV(PA7));
-}
-void lightA_off(void) {
-	DDRB &= ~(_BV(PB2));
-}
