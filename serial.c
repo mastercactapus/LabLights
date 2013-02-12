@@ -11,8 +11,8 @@
 #define TX_PORT PORTB
 #define TX_PIN  PB0
 
-#define RX_DELAY 110 //tuned for 9600bps
-#define RX_PORT PORTB
+#define RX_DELAY 94 //tuned for 9600bps
+#define RX_PORT PINB
 #define RX_PIN  PB1
 
 SBUF *s_buffer;
@@ -30,7 +30,6 @@ void setup_serial(void) {
 
 void send_byte(uint8_t b)
 {
-  cli();
   b = ~b;
   TX_PORT &= ~(_BV(TX_PIN));     // start bit
   for(uint8_t i = 10; i; i--){   // 10 bits
@@ -41,7 +40,6 @@ void send_byte(uint8_t b)
       TX_PORT |= _BV(TX_PIN);    // data bit 1 or stop bit
     b >>= 1;
   }
-  sei();
 }
 
 void send_bytes(uint8_t *buf, uint8_t len) {
@@ -51,19 +49,18 @@ void send_bytes(uint8_t *buf, uint8_t len) {
 }
 
 ISR (PCINT1_vect) {
-	// lightA->status = ON;
-
-	_delay_us(RX_DELAY);
+  if (s_buffer->flag) return;
+	_delay_us(RX_DELAY/2);
 	uint8_t read = 0;
-	for (uint8_t i=0; i<8; i++){
+	for (uint8_t i=8; i; i--){
 		_delay_us(RX_DELAY);
-		if (RX_PORT & _BV(i)) read |= (1 << i);
+    read >>= 1;
+		if (RX_PORT & _BV(RX_PIN))
+      read |= _BV(7);
 	}
 	s_buffer->byte = read;
 	s_buffer->flag = 1;
-	_delay_us(RX_DELAY*2);
-
-	send_byte(s_buffer->byte);
+  _delay_us(RX_DELAY);
 }
 
 uint8_t read_byte(void) {
