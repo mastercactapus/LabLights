@@ -7,7 +7,7 @@
 #include "serial.h"
 #include "types.h"
 
-#define TX_DELAY 94 //tuned for 9600bps
+#define TX_DELAY 92 //tuned for 9600bps
 #define TX_PORT PORTB
 #define TX_PIN  PB0
 
@@ -28,16 +28,21 @@ void setup_serial(void) {
 
 void send_byte(uint8_t b)
 {
+  cli();
   b = ~b;
-  TX_PORT &= ~(_BV(TX_PIN));     // start bit
-  for(uint8_t i = 10; i; i--){   // 10 bits
-    _delay_us( TX_DELAY );       // bit duration
+  TX_PORT &= ~(_BV(TX_PIN));
+  _delay_us( TX_DELAY );
+  for(uint8_t i = 8; i; i--){
     if(b & 1)
-      TX_PORT &= ~(_BV(TX_PIN)); // data bit 0
+      TX_PORT &= ~(_BV(TX_PIN));
     else
-      TX_PORT |= _BV(TX_PIN);    // data bit 1 or stop bit
+      TX_PORT |= _BV(TX_PIN);
     b >>= 1;
+    _delay_us(TX_DELAY);
   }
+  TX_PORT |= _BV(TX_PIN);
+  _delay_us(TX_DELAY);
+  sei();
 }
 
 void send_bytes(uint8_t *buf, uint8_t len) {
@@ -110,4 +115,3 @@ uint8_t read_byte(void) {
   s_buffer->count--;
 	return out;
 }
-
