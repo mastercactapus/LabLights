@@ -23,9 +23,7 @@ void setup_serial(void) {
   PCMSK1 |= _BV(PCINT9);
   GIMSK |= _BV(PCIE1);
   s_buffer = malloc(sizeof(SBUF));
-  s_buffer->flag = 0;
-  s_buffer->byte = 0;
-
+  s_buffer->count = 0;
 }
 
 void send_byte(uint8_t b)
@@ -49,23 +47,28 @@ void send_bytes(uint8_t *buf, uint8_t len) {
 }
 
 ISR (PCINT1_vect) {
-  if (s_buffer->flag) return;
-	_delay_us(RX_DELAY/2);
-	uint8_t read = 0;
-	for (uint8_t i=8; i; i--){
-		_delay_us(RX_DELAY);
-    read >>= 1;
-		if (RX_PORT & _BV(RX_PIN))
-      read |= _BV(7);
-	}
-	s_buffer->byte = read;
-	s_buffer->flag = 1;
-  _delay_us(RX_DELAY);
+  if (s_buffer->count >= BUFFER) {
+    _delay_us(RX_DELAY * 9.5);
+  } else {
+    _delay_us(RX_DELAY/2);
+    uint8_t read = 0;
+    for (uint8_t i=8; i; i--){
+      _delay_us(RX_DELAY);
+      read >>= 1;
+      if (RX_PORT & _BV(RX_PIN))
+        read |= _BV(7);
+    }
+    s_buffer->byte[s_buffer->count++] = read;
+    _delay_us(RX_DELAY);
+  }
 }
 
 uint8_t read_byte(void) {
-	while(!s_buffer->flag);
-	s_buffer->flag=0;
-	return s_buffer->byte;
+	while(s_buffer->count == 0);
+	uint8_t out =s_buffer->byte[0];
+  for(uint8_t i=s_buffer->count;i;i--)
+    s_buffer->byte[i-1] = s_buffer->byte[i];
+  s_buffer->count--;
+	return out;
 }
 
