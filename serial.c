@@ -46,6 +46,14 @@ void send_bytes(uint8_t *buf, uint8_t len) {
   }
 }
 
+void send_string(char *str) {
+  uint8_t i=0;
+  while (str[i] != 0) {
+    send_byte((uint8_t)str[i]);
+    i++;
+  }
+}
+
 ISR (PCINT1_vect) {
   if (s_buffer->count >= BUFFER) {
     _delay_us(RX_DELAY * 9.5);
@@ -63,6 +71,37 @@ ISR (PCINT1_vect) {
   }
 }
 
+char* read_line(void) {
+  char buf[32];
+
+  uint8_t i=0;
+  uint8_t c;
+  while ((peek_byte() == 13) || (peek_byte() == 10)) read_byte();
+  c = read_byte();
+  while ((c != 13) && (c != 10)) {
+    buf[i] = (char)c;
+    c=read_byte();
+    if (i<32) {
+      i++;
+      send_byte(c);
+    }
+  }
+  send_byte(10);
+  send_byte(13);
+  return buf;
+}
+
+uint8_t* read_bytes(uint8_t len) {
+  uint8_t buf[len];
+  for (uint8_t i=len;i;i--){
+    buf[i-1] = read_byte();
+  }
+  return buf;
+}
+uint8_t peek_byte(void) {
+  while(s_buffer->count == 0);
+  return s_buffer->byte[0];
+}
 uint8_t read_byte(void) {
 	while(s_buffer->count == 0);
 	uint8_t out =s_buffer->byte[0];

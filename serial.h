@@ -4,6 +4,10 @@ void setup_serial(void);
 void send_byte(uint8_t b);
 void send_bytes(uint8_t *buf, uint8_t len);
 uint8_t read_byte(void);
+uint8_t* read_bytes(uint8_t len);
+char* read_line(void);
+void send_string(char *str);
+uint8_t peek_byte(void);
 
 typedef struct {
 	volatile uint8_t byte[BUFFER];
