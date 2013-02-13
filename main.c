@@ -4,6 +4,7 @@
 #include <util/delay.h>
 #include <stdlib.h>
 #include <avr/interrupt.h>
+#include <string.h>
 
 #include "types.h"
 #include "eeprom.h"
@@ -13,6 +14,7 @@
 
 LIGHT *lightA;
 LIGHT *lightB;
+
 
 int main(void) {
 
@@ -30,24 +32,23 @@ int main(void) {
   start_sliderAB();
 
   lightA->settings->power_level = 0xff;
-  lightA->settings->dim_level = 0x10;
+  lightA->settings->dim_level = 0x88;
   lightA->status = ON;
 
   sei();
-  
 
-  _delay_ms(1000);
-  lightA->status = DIM;
+  send_string("\r\n\nLighting System Online\r\n\n");
 
 
-  _delay_ms(1000);
-  lightA->status = OFF;
-
-  read_byte();
-  lightA->status = ON;
-
-
-  while(1);
+  while(1){
+    char *line;
+    send_string("LabLights: ");
+    line = read_line();
+    if (strcmp(line, "light on") == 0) {lightA->status = ON;}
+    else if (strcmp(line, "light dim") == 0) {lightA->status = DIM;}
+    else if (strcmp(line, "light off") == 0) {lightA->status = OFF;}
+    else {send_string("Unknown Command!\r\n\n");}
+  };
   return 0;
 }
 
