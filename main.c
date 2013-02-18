@@ -73,7 +73,7 @@ void txt_cmd(void) {
   else if (scmp(word,"status")) req->command = STATUS;
   else if (scmp(word,"dim_delay")) req->command = DIM_DELAY;
   else if (scmp(word,"off_delay")) req->command = OFF_DELAY;
-  else {send_string("Unknown command\r\n\n");return;}
+  else {send_string("Unknown parameter\r\n\n");return;}
 
   get_word(word,line);
   uint8_t val = 0;
