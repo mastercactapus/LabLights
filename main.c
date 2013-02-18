@@ -35,8 +35,8 @@ int main(void) {
   lightA->settings->dim_level = 0x88;
   lightA->status = ON;
 
+  //send_string("\r\n\nLighting System Online\r\n\n");
   sei();
-  send_string("\r\n\nLighting System Online\r\n\n");
   while(1){
     flush();
     if (peek_byte() & _BV(0))
@@ -60,33 +60,32 @@ void bin_cmd(void) {
 }
 
 void txt_cmd(void) {
-  char line[64];
+  char *line, *word;
   send_string("LabLights: ");
-  read_line(line, 64);
-  REQUEST *req = malloc(sizeof(REQUEST));
+  line = read_line(32);
+  REQUEST *req = calloc(1,sizeof(REQUEST));
 
   req->read_write = WRITE;
 
-  char word[32];
-  get_word(word,line);
-  if(scmp(word,"lightA")) req->light_AB = LIGHT_A;
-  else if(scmp(word,"lightB")) req->light_AB = LIGHT_B;
-  else if (scmp(word,"dump_config")) {dump_config(); return;}
+  word = get_word(line);
+  if(s_eq(word,"lightA")) req->light_AB = LIGHT_A;
+  else if(s_eq(word,"lightB")) req->light_AB = LIGHT_B;
+  else if (s_eq(word,"dump_config")) {dump_config(); return;}
   else {send_string("Unknown command\r\n\n");return;}
 
-  get_word(word,line);
-  if (scmp(word,"dim_level")) req->command = DIM_LEVEL;
-  else if (scmp(word,"power_level")) req->command = POWER_LEVEL;
-  else if (scmp(word,"status")) req->command = STATUS;
-  else if (scmp(word,"dim_delay")) req->command = DIM_DELAY;
-  else if (scmp(word,"off_delay")) req->command = OFF_DELAY;
+  word = get_word(line);
+  if (s_eq(word,"dim_level")) req->command = DIM_LEVEL;
+  else if (s_eq(word,"power_level")) req->command = POWER_LEVEL;
+  else if (s_eq(word,"status")) req->command = STATUS;
+  else if (s_eq(word,"dim_delay")) req->command = DIM_DELAY;
+  else if (s_eq(word,"off_delay")) req->command = OFF_DELAY;
   else {send_string("Unknown parameter\r\n\n");return;}
 
-  get_word(word,line);
+  word = get_word(line);
   uint8_t val = 0;
-  if (scmp(word,"on")) val = ON;
-  else if (scmp(word,"off")) val = OFF;
-  else if (scmp(word,"dim")) val = DIM;
+  if (s_eq(word,"on")) val = (uint8_t)ON;
+  else if (s_eq(word,"off")) val = (uint8_t)OFF;
+  else if (s_eq(word,"dim")) val = (uint8_t)DIM;
   else val = hex_to_uint8(word);
   req->value = val;
 
@@ -94,47 +93,38 @@ void txt_cmd(void) {
 }
 
 void dump_config(void) {
-  char buf[8];
-  if (lightA->status == ON) memcpy(buf, "on", 3);
-  else if (lightA->status == DIM) memcpy(buf, "dim", 4);
-  else if (lightA->status == OFF) memcpy(buf, "off", 4);
-  else memcpy(buf, "broken", 7);
+  dump_light_config(lightA,"lightA");
+  dump_light_config(lightB,"lightB");
+}
+void dump_light_config(LIGHT *light, char *light_name) {
+  char *status;
+  if (lightB->status == ON) status = "on";
+  else if (lightB->status == DIM) status = "dim";
+  else if (lightB->status == OFF) status = "off";
+  else status = "broken";
 
-  send_string(" lightA -> \r\n");
-  send_string("   status:  ");send_string(buf);send_string("\r\n");
-  uint8_to_hex(buf,lightA->minutes);
-  send_string("   minutes: ");send_string(buf);send_string("\r\n");
+  send_string(light_name);
+  send_string(" -> \r\n");
+  send_string("   status:  ");
+    send_string(status);
+    send_string("\r\n");
+  send_string("   minutes: ");
+    send_string(uint8_to_hex(light->minutes));
+    send_string("\r\n");
   send_string("   settings -> \r\n");
-  uint8_to_hex(buf,lightA->settings->auto_off_delay);
-  send_string("     off_delay:   ");send_string(buf);send_string("\r\n");
-  uint8_to_hex(buf,lightA->settings->auto_dim_delay);
-  send_string("     dim_delay:   ");send_string(buf);send_string("\r\n");
-  uint8_to_hex(buf,lightA->settings->power_level);
-  send_string("     power_level: ");send_string(buf);send_string("\r\n");
-  uint8_to_hex(buf,lightA->settings->dim_level);
-  send_string("     dim_level:   ");send_string(buf);send_string("\r\n");
-  send_string("\r\n");
-
-
-  if (lightB->status == ON) memcpy(buf, "on", 3);
-  else if (lightB->status == DIM) memcpy(buf, "dim", 4);
-  else if (lightB->status == OFF) memcpy(buf, "off", 4);
-  else memcpy(buf, "broken", 7);
-
-  send_string(" lightB -> \r\n");
-  send_string("   status:  ");send_string(buf);send_string("\r\n");
-  uint8_to_hex(buf,lightB->minutes);
-  send_string("   minutes: ");send_string(buf);send_string("\r\n");
-  send_string("   settings -> \r\n");
-  uint8_to_hex(buf,lightB->settings->auto_off_delay);
-  send_string("     off_delay:   ");send_string(buf);send_string("\r\n");
-  uint8_to_hex(buf,lightB->settings->auto_dim_delay);
-  send_string("     dim_delay:   ");send_string(buf);send_string("\r\n");
-  uint8_to_hex(buf,lightB->settings->power_level);
-  send_string("     power_level: ");send_string(buf);send_string("\r\n");
-  uint8_to_hex(buf,lightB->settings->dim_level);
-  send_string("     dim_level:   ");send_string(buf);send_string("\r\n");
-  send_string("\r\n");
+  send_string("     off_delay:   ");
+    send_string(uint8_to_hex(light->settings->auto_off_delay));
+    send_string("\r\n");
+  send_string("     dim_delay:   ");
+    send_string(uint8_to_hex(light->settings->auto_dim_delay));
+    send_string("\r\n");
+  send_string("     power_level: ");
+    send_string(uint8_to_hex(light->settings->power_level));
+    send_string("\r\n");
+  uint8_to_hex(light->settings->dim_level);
+  send_string("     dim_level:   ");
+    send_string(uint8_to_hex(light->settings->dim_level));
+    send_string("\r\n\n");
 }
 
 
