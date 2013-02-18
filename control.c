@@ -27,6 +27,7 @@
 
 //called when timer1 is up
 ISR (TIM1_COMPA_vect) {
+	sei(); // we could have incoming data
 	// static uint16_t steps = 0;
 	// static uint8_t seconds = 0;
 	// static uint8_t minutes = 0;
