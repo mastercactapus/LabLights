@@ -8,6 +8,7 @@ void read_bytes(uint8_t *buf, uint8_t len);
 void read_line(char *buf, uint8_t maxlen);
 void send_string(char *str);
 uint8_t peek_byte(void);
+void flush(void);
 
 typedef struct {
 	volatile uint8_t byte[BUFFER];

@@ -3,6 +3,7 @@
 #include <avr/io.h>
 #include <util/delay.h>
 #include <stdlib.h>
+#include <string.h>
 #include <avr/interrupt.h>
 #include "serial.h"
 #include "types.h"
@@ -96,7 +97,10 @@ void read_line(char *buf, uint8_t max_len) {
   send_byte(10);
   send_byte(13);
 }
-
+void flush(void) {
+  memset(&s_buffer->byte,0,BUFFER);
+  s_buffer->count = 0;
+}
 void read_bytes(uint8_t *buf, uint8_t len) {
   for (uint8_t i=0;i<len;i++){
     buf[i] = read_byte();
