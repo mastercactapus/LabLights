@@ -90,7 +90,7 @@ void txt_cmd(void) {
   else val = hex_to_uint8(word);
   req->value = val;
 
-
+  proc_req(req);
 }
 
 void dump_config(void) {
