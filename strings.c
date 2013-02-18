@@ -1,5 +1,6 @@
 #include <stdint.h>
 #include <string.h>
+#include <stdlib.h>
 #include "strings.h"
 
 uint8_t hex_value(char chr) { //invalid values will return 0
@@ -22,12 +23,13 @@ char hex_char(uint8_t val) {
 }
 
 uint8_t hex_to_uint8(char *str) {
-  if (str_len(str) > 1) 
+  if (strlen(str) > 1) 
     return 16 * hex_value(str[0]) + hex_value(str[1]);
   return hex_value(str[0]);
 }
 
-void uint8_to_hex(char *buf, uint8_t num) {
+char* uint8_to_hex(uint8_t num) {
+  char *buf = calloc(4,1);
   if (num < 16) {
     buf[0] = hex_char(num);
     buf[1] = 0;
@@ -36,41 +38,16 @@ void uint8_to_hex(char *buf, uint8_t num) {
     buf[1] = hex_char(num % 16);
     buf[2] = 0;
   }
+  return buf;
 }
 
-uint8_t scmp(char *str1, char *str2) {
-  uint8_t i = 0;
-  while (!((str1[i] == 0) && (str2[i] == 0))) {
-    if (str1[i] != str2[i]) {
-      return 0;
-    } else if (i == 255) {
-      break;
-    } else {
-      i++;
-    }
-  }
-  return 1;
-}
 
-uint8_t str_len(char *str) {
-  uint8_t i = 0;
-  while (str[i] != 0) i++;
-  return i;
-}
-
-void get_word(char *buf, char *str) {
-  uint8_t i =0;
-  while (str[i] != 32 && str[i] != 0) i++;
-  if (str[i] == 0) {
-    memcpy(buf,str,i);
-    str[0] = 0;
-    buf[i] = 0;
-  } else {
-    memcpy(buf,str,i);
-    uint8_t l = i;
-    while (str[l] != 0) l++;
-    uint8_t len = l-i;
-    memcpy(str,str + i + 1, len);
-    str[len] = 0;
-  }
+char* get_word(char *str) {
+  char *out = calloc(16,1);
+  char *end = strchrnul(str,32);
+  size_t len = end - str;
+  memcpy(out, str, len);
+  size_t size = strlen(str);
+  memmove(str, end + 1, size - len);
+  return out;
 }
