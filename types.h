@@ -10,9 +10,9 @@ typedef enum {
 }COMMAND;
 
 typedef enum {
-	OFF,
-	ON ,
-	DIM 
+	OFF = 0,
+	ON = 1,
+	DIM = 2
 }POWER_STATUS;
 
 typedef enum {
