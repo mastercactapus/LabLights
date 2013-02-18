@@ -128,5 +128,36 @@ void dump_config(void) {
   uint8_to_hex(buf,lightB->settings->dim_level);
   send_string("     dim_level:   ");send_string(buf);send_string("\r\n");
   send_string("\r\n");
+}
 
+
+uint8_t proc_req(REQUEST *req) {
+  LIGHT *work = (req->light_AB == LIGHT_A ? lightA : lightB);
+
+  volatile uint8_t *val;
+  switch(req->command) {
+    case STATUS:
+    val = &work->status;
+    break;
+    case DIM_LEVEL:
+    val = &work->settings->dim_level;
+    break;
+    case POWER_LEVEL:
+    val = &work->settings->power_level;
+    break;
+    case DIM_DELAY:
+    val = &work->settings->auto_dim_delay;
+    break;
+    case OFF_DELAY:
+    val = &work->settings->auto_off_delay;
+    break;
+    default:
+    return 0;
+  }
+
+  if (req->read_write == READ)
+    return *val;
+
+  *val = req->value;
+  return 1;
 }
