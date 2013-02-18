@@ -80,7 +80,6 @@ ISR (PCINT1_vect) {
 }
 
 void read_line(char *buf, uint8_t max_len) {
-
   uint8_t i=0;
   uint8_t c;
   while ((peek_byte() == 13) || (peek_byte() == 10)) read_byte();
@@ -113,6 +112,6 @@ uint8_t peek_byte(void) {
 uint8_t read_byte(void) {
 	while(s_buffer->count == 0);
 	uint8_t out =s_buffer->byte[0];
-  memcpy(&s_buffer->byte[0], s_buffer->byte[1], --s_buffer->count);
+  memcpy(&s_buffer->byte, &s_buffer->byte + 1, --s_buffer->count);
 	return out;
 }
