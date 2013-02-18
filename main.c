@@ -79,6 +79,7 @@ void txt_cmd(void) {
   uint8_t val = 0;
   if (strcmp(word,"on")) val = ON;
   else if (strcmp(word,"off")) val = OFF;
+  else if (strcmp(word,"dim")) val = DIM;
   else val = hex_to_uint8(word);
   req->value = val;
 
