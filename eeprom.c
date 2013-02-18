@@ -1,5 +1,6 @@
 #include <avr/eeprom.h>
 #include <stdlib.h>
+#include <string.h>
 #include <avr/interrupt.h>
 #include "types.h"
 #include "eeprom.h"
@@ -38,7 +39,7 @@ void save_settings() {
 }
 
 void set_defaults(LIGHT_SETTINGS *settings) {
-	free(settings);
+	memset(settings,0,sizeof(LIGHT_SETTINGS));
 	settings->checksum = calc_checksum(settings);
 }
 
