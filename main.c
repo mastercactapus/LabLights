@@ -86,14 +86,12 @@ void txt_cmd(void) {
 
 }
 
-
-
 void dump_config(void) {
-  char *buf[8];
-  if (lightA->status == ON) buf = "on";
-  else if (lightA->status == DIM) buf = "dim";
-  else if (lightA->status == OFF) buf = "off";
-  else buf = "broken";
+  char buf[8];
+  if (lightA->status == ON) memcpy(buf, "on", 3);
+  else if (lightA->status == DIM) memcpy(buf, "dim", 4);
+  else if (lightA->status == OFF) memcpy(buf, "off", 4);
+  else memcpy(buf, "broken", 7);
 
   send_string(" lightA -> \r\n");
   send_string("   status:  ");send_string(buf);send_string("\r\n");
@@ -109,6 +107,12 @@ void dump_config(void) {
   uint8_to_hex(buf,lightA->settings->dim_level);
   send_string("     dim_level:   ");send_string(buf);send_string("\r\n");
   send_string("\r\n");
+
+
+  if (lightB->status == ON) memcpy(buf, "on", 3);
+  else if (lightB->status == DIM) memcpy(buf, "dim", 4);
+  else if (lightB->status == OFF) memcpy(buf, "off", 4);
+  else memcpy(buf, "broken", 7);
 
   send_string(" lightB -> \r\n");
   send_string("   status:  ");send_string(buf);send_string("\r\n");
