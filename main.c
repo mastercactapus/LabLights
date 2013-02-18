@@ -4,13 +4,13 @@
 #include <util/delay.h>
 #include <stdlib.h>
 #include <avr/interrupt.h>
-#include <string.h>
 
 #include "types.h"
 #include "eeprom.h"
 #include "config_hardware.h"
 #include "control.h"
 #include "serial.h"
+#include "strings.h"
 
 LIGHT *lightA;
 LIGHT *lightB;
