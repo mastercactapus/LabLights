@@ -1,3 +1,5 @@
+#include <stdint.h>
+#include <string.h>
 #include "strings.h"
 
 uint8_t hex_value(char chr) { //invalid values will return 0
@@ -20,7 +22,6 @@ char hex_char(uint8_t val) {
 }
 
 uint8_t hex_to_uint8(char *str) {
-  uint8_t out = 0;
   if (str_len(str) > 1) 
     return 16 * hex_value(str[0]) + hex_value(str[1]);
   return hex_value(str[0]);
@@ -50,11 +51,13 @@ uint8_t scmp(char *str1, char *str2) {
   }
   return 1;
 }
+
 uint8_t str_len(char *str) {
   uint8_t i = 0;
   while (str[i] != 0) i++;
   return i;
 }
+
 void get_word(char *buf, char *str) {
   uint8_t i =0;
   while (str[i] != 32 && str[i] != 0) i++;
@@ -66,6 +69,8 @@ void get_word(char *buf, char *str) {
     memcpy(buf,str,i);
     uint8_t l = i;
     while (str[l] != 0) l++;
-    memcpy(str,str + i + 1, l-i);
+    uint8_t len = l-i;
+    memcpy(str,str + i + 1, len);
+    str[len] = 0;
   }
 }
