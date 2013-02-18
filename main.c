@@ -47,11 +47,16 @@ int main(void) {
   return 0;
 }
 
-
 void bin_cmd(void) {
   REQUEST *req = malloc(sizeof(REQUEST));
-  read_bytes(req, sizeof(REQUEST));
-
+  read_bytes((uint8_t*)req, sizeof(REQUEST));
+  uint8_t chk = 43;
+  chk += *((uint8_t*)req) + *(((uint8_t*)req)+1);
+  if (chk == req->chk) {
+    uint8_t res = proc_req(req);
+    if (req->read_write == READ)
+      send_byte(res);
+  }
 }
 
 void txt_cmd(void) {
