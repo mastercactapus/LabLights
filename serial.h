@@ -5,7 +5,7 @@ void send_byte(uint8_t b);
 void send_bytes(uint8_t *buf, uint8_t len);
 uint8_t read_byte(void);
 void read_bytes(uint8_t *buf, uint8_t len);
-void read_line(char *buf, uint8_t maxlen);
+char* read_line(uint8_t maxlen);
 void send_string(char *str);
 uint8_t peek_byte(void);
 void flush(void);

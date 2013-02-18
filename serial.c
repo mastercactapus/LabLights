@@ -53,11 +53,8 @@ void send_bytes(uint8_t *buf, uint8_t len) {
 }
 
 void send_string(char *str) {
-  uint8_t i=0;
-  while (str[i] != 0) {
-    send_byte((uint8_t)str[i]);
-    i++;
-  }
+  size_t len = strlen(str);
+  send_bytes((uint8_t*)str,len);
 }
 
 ISR (PCINT1_vect) {
@@ -79,7 +76,8 @@ ISR (PCINT1_vect) {
   }
 }
 
-void read_line(char *buf, uint8_t max_len) {
+char* read_line(uint8_t max_len) {
+  char *buf = calloc(max_len,1);
   uint8_t i=0;
   uint8_t c;
   while ((peek_byte() == 13) || (peek_byte() == 10)) read_byte();
@@ -93,9 +91,12 @@ void read_line(char *buf, uint8_t max_len) {
       send_byte(c);
     }
   }
+  buf[i] = 0;
   send_byte(10);
   send_byte(13);
+  return buf;
 }
+
 void flush(void) {
   memset(&s_buffer->byte,0,BUFFER);
   s_buffer->count = 0;
@@ -112,6 +113,6 @@ uint8_t peek_byte(void) {
 uint8_t read_byte(void) {
 	while(s_buffer->count == 0);
 	uint8_t out =s_buffer->byte[0];
-  memcpy(&s_buffer->byte, &s_buffer->byte + 1, --s_buffer->count);
+  memmove(&s_buffer->byte, &s_buffer->byte + 1, --s_buffer->count);
 	return out;
 }
