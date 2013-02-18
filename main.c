@@ -38,6 +38,7 @@ int main(void) {
   sei();
   send_string("\r\n\nLighting System Online\r\n\n");
   while(1){
+    flush();
     if (peek_byte() & _BV(0))
       bin_cmd();
     else
