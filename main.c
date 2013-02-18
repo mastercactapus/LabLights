@@ -53,9 +53,9 @@ void bin_cmd(void) {
 }
 
 void txt_cmd(void) {
-  char line[48];
+  char line[64];
   send_string("LabLights: ");
-  read_line(line, 48);
+  read_line(line, 64);
   REQUEST *req = malloc(sizeof(REQUEST));
 
   req->read_write = WRITE;
