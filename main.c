@@ -89,5 +89,40 @@ void txt_cmd(void) {
 
 
 void dump_config(void) {
+  char *buf[8];
+  if (lightA->status == ON) buf = "on";
+  else if (lightA->status == DIM) buf = "dim";
+  else if (lightA->status == OFF) buf = "off";
+  else buf = "broken";
+
+  send_string(" lightA -> \r\n");
+  send_string("   status:  ");send_string(buf);send_string("\r\n");
+  uint8_to_hex(buf,lightA->minutes);
+  send_string("   minutes: ");send_string(buf);send_string("\r\n");
+  send_string("   settings -> \r\n");
+  uint8_to_hex(buf,lightA->settings->auto_off_delay);
+  send_string("     off_delay:   ");send_string(buf);send_string("\r\n");
+  uint8_to_hex(buf,lightA->settings->auto_dim_delay);
+  send_string("     dim_delay:   ");send_string(buf);send_string("\r\n");
+  uint8_to_hex(buf,lightA->settings->power_level);
+  send_string("     power_level: ");send_string(buf);send_string("\r\n");
+  uint8_to_hex(buf,lightA->settings->dim_level);
+  send_string("     dim_level:   ");send_string(buf);send_string("\r\n");
+  send_string("\r\n");
+
+  send_string(" lightB -> \r\n");
+  send_string("   status:  ");send_string(buf);send_string("\r\n");
+  uint8_to_hex(buf,lightB->minutes);
+  send_string("   minutes: ");send_string(buf);send_string("\r\n");
+  send_string("   settings -> \r\n");
+  uint8_to_hex(buf,lightB->settings->auto_off_delay);
+  send_string("     off_delay:   ");send_string(buf);send_string("\r\n");
+  uint8_to_hex(buf,lightB->settings->auto_dim_delay);
+  send_string("     dim_delay:   ");send_string(buf);send_string("\r\n");
+  uint8_to_hex(buf,lightB->settings->power_level);
+  send_string("     power_level: ");send_string(buf);send_string("\r\n");
+  uint8_to_hex(buf,lightB->settings->dim_level);
+  send_string("     dim_level:   ");send_string(buf);send_string("\r\n");
+  send_string("\r\n");
 
 }
