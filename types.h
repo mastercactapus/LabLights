@@ -1,7 +1,7 @@
 #define _DEFAULT_SETTINGS {0,0,0,0,0xffff}
 
 typedef enum {
-	NOP,
+	NOP = 128,
 	DIM_LEVEL,
 	POWER_LEVEL,
 	STATUS,
@@ -15,12 +15,22 @@ typedef enum {
 	DIM 
 }POWER_STATUS;
 
+typedef enum {
+	READ,
+	WRITE
+} READ_WRITE;
+
+typedef enum {
+	LIGHT_A,
+	LIGHT_B
+} LIGHT_AB;
+
 typedef struct 
 {
-	uint8_t read_write :1;
-	uint8_t light_AB   :1;
 	COMMAND command    :6;
-	uint16_t value;
+	READ_WRITE read_write :1;
+	LIGHT_AB light_AB   :1;
+	uint8_t value;
 	uint8_t chk; //sum of all + 43
 }REQUEST;
 
