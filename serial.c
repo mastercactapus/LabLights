@@ -60,6 +60,7 @@ void send_string(char *str) {
 }
 
 ISR (PCINT1_vect) {
+  if (RX_PORT & _BV(RX_PIN)) return;
   if (s_buffer->count >= BUFFER) {
     _delay_us(RX_DELAY * 9.5);
   } else {
@@ -73,35 +74,33 @@ ISR (PCINT1_vect) {
     }
     s_buffer->byte[s_buffer->count++] = read;
     _delay_us(RX_DELAY);
+    PORTA ^= _BV(PA1);
   }
 }
 
-char* read_line(void) {
-  char buf[32];
+void read_line(char *buf, uint8_t max_len) {
 
   uint8_t i=0;
   uint8_t c;
   while ((peek_byte() == 13) || (peek_byte() == 10)) read_byte();
   c = read_byte();
+  send_byte(c);
   while ((c != 13) && (c != 10)) {
     buf[i] = (char)c;
     c=read_byte();
-    if (i<32) {
+    if (i<max_len) {
       i++;
       send_byte(c);
     }
   }
   send_byte(10);
   send_byte(13);
-  return buf;
 }
 
-uint8_t* read_bytes(uint8_t len) {
-  uint8_t buf[len];
-  for (uint8_t i=len;i;i--){
-    buf[i-1] = read_byte();
+void read_bytes(uint8_t *buf, uint8_t len) {
+  for (uint8_t i=0;i<len;i++){
+    buf[i] = read_byte();
   }
-  return buf;
 }
 uint8_t peek_byte(void) {
   while(s_buffer->count == 0);
@@ -110,8 +109,6 @@ uint8_t peek_byte(void) {
 uint8_t read_byte(void) {
 	while(s_buffer->count == 0);
 	uint8_t out =s_buffer->byte[0];
-  for(uint8_t i=s_buffer->count;i;i--)
-    s_buffer->byte[i-1] = s_buffer->byte[i];
-  s_buffer->count--;
+  memcpy(&s_buffer->byte[0], s_buffer->byte[1], --s_buffer->count);
 	return out;
 }
